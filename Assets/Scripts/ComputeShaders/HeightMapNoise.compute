@@ -1,0 +1,10 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel FillArray
+#pragma kernel ClearArray
+
+#include "Noise/SimplexNoise.compute"
+
+struct Voxel
+{
+    int ID;
+};

@@ -343,8 +343,8 @@ MonoBehaviour:
   blockTypes:
   - {fileID: 11400000, guid: c250d0d125707a742ac07d35e1505008, type: 2}
   worldSettings:
-    containerSize: 64
-    maxHeight: 120
+    containerSize: 8
+    maxHeight: 8
   container: {fileID: 0}
 --- !u!4 &2024032979
 Transform:

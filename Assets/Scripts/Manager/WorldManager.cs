@@ -17,7 +17,7 @@ public class WorldManager : MonoBehaviour
         GameObject cubeObj = new GameObject("CubeContainer");
         cubeObj.transform.parent = transform;
         container = cubeObj.AddComponent<Container>();
-        container.Initialize(Vector3.zero);
+        container.Initialize(Vector3.zero, textureAtlas, blockTypes);
 
         /*for (int x = 0; x < 16; x++)
         {

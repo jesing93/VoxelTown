@@ -7,18 +7,18 @@ using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(BoxCollider))]
+[RequireComponent(typeof(MeshCollider))]
 
 public class Container : MonoBehaviour
 {
-    private Block blockData;
+    private Block[] blockData;
     private Texture2D textureAtlas;
-    private Vector3 position = new(0, 0, 0);
+    private Vector3 blockPos;
     public Vector3 containerPosition;
 
     // Noise buffer data
     public NoiseBuffer data;
-    private Mesh meshData = new();
+    private Mesh meshData;
 
     //Components
     private MeshRenderer meshRenderer;
@@ -26,22 +26,33 @@ public class Container : MonoBehaviour
     private MeshCollider meshCollider;
 
     //Render data lists
-    private List<Vector3> vertices = new();
-    private List<int> triangles = new();
-    private List<Vector2> uvs = new();
+    private List<Vector3> vertices;
+    private List<int> triangles;
+    private List<Vector2> uvs;
 
     private int lastVertex = 0;
     private int textureWidth = 0;
     private int numTextures = 16;
+
+    private void Awake()
+    {
+        blockPos = new(0, 0, 0);
+        meshData = new();
+        vertices = new();
+        triangles = new();
+        uvs = new();
+    }
 
     /// <summary>
     /// Initialize the voxels container
     /// </summary>
     /// <param name="atlas"></param>
     /// <param name="newBlockData"></param>
-    public void Initialize(Vector3 position)
+    public void Initialize(Vector3 position, Texture2D atlas, Block[] newBlockData)
     {
         ConfigureComponents();
+        textureAtlas = atlas;
+        blockData = newBlockData;
         data = ComputeManager.Instance.GetNoiseBuffer();
         containerPosition = position;
 
@@ -83,10 +94,9 @@ public class Container : MonoBehaviour
     /// </summary>
     public void GenerateMesh()
     {
-        Vector3 blockPos;
         Voxel block;
 
-        int counter = 0;
+        //int counter = 0;
         Vector3[] faceVertices = new Vector3[4];
         Vector2[] faceUVs = new Vector2[4];
 
@@ -98,9 +108,7 @@ public class Container : MonoBehaviour
                 {
                     blockPos = new(x, y, z);
                     block = this[blockPos];
-                    //Only check on solid blocks
-                    if (!block.isSolid)
-                        continue;
+                    
                     DrawCube();
 
                     //Set the mesh data
@@ -125,6 +133,19 @@ public class Container : MonoBehaviour
         meshFilter.mesh = meshData;
         meshCollider.sharedMesh = meshData;
         meshRenderer.material.mainTexture = textureAtlas;
+    }
+
+    /// <summary>
+    /// Check if voxel in point is solid
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    public bool checkVoxelIsSolid(Vector3 point)
+    {
+        if (point.y < 0 || (point.x > WorldManager.WorldSettings.containerSize + 2) || (point.z > WorldManager.WorldSettings.containerSize + 2))
+            return true;
+        else
+            return this[point].isSolid;
     }
 
     public Voxel this[Vector3 index]
@@ -153,16 +174,16 @@ public class Container : MonoBehaviour
     }
 
     private void Front_GenerateFace()
-    {
-        if (this[position + voxelFaceChecks[1]].isSolid)
+    {//Only check on solid blocks
+        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[1]))
             return;
         lastVertex = vertices.Count;
 
         //Declare vertices
-        vertices.Add(position + new Vector3(-0.5f, 0, 0.5f)); //0
-        vertices.Add(position + new Vector3(-0.5f, 1, 0.5f)); //1
-        vertices.Add(position + new Vector3(0.5f, 1, 0.5f)); //2
-        vertices.Add(position + new Vector3(0.5f, 0, 0.5f)); //3
+        vertices.Add(blockPos + new Vector3(-0.5f, 0, 0.5f)); //0
+        vertices.Add(blockPos + new Vector3(-0.5f, 1, 0.5f)); //1
+        vertices.Add(blockPos + new Vector3(0.5f, 1, 0.5f)); //2
+        vertices.Add(blockPos + new Vector3(0.5f, 0, 0.5f)); //3
 
         AddTriangles();
         AddUVs(0);
@@ -170,15 +191,15 @@ public class Container : MonoBehaviour
 
     private void Back_GenerateFace()
     {
-        if (this[position + voxelFaceChecks[0]].isSolid)
+        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[0]))
             return;
         lastVertex = vertices.Count;
 
         //Declare vertices
-        vertices.Add(position + new Vector3(0.5f, 0, -0.5f)); //0
-        vertices.Add(position + new Vector3(0.5f, 1, -0.5f)); //1
-        vertices.Add(position + new Vector3(-0.5f, 1, -0.5f)); //2
-        vertices.Add(position + new Vector3(-0.5f, 0, -0.5f)); //3
+        vertices.Add(blockPos + new Vector3(0.5f, 0, -0.5f)); //0
+        vertices.Add(blockPos + new Vector3(0.5f, 1, -0.5f)); //1
+        vertices.Add(blockPos + new Vector3(-0.5f, 1, -0.5f)); //2
+        vertices.Add(blockPos + new Vector3(-0.5f, 0, -0.5f)); //3
 
         AddTriangles();
         AddUVs(0);
@@ -186,15 +207,15 @@ public class Container : MonoBehaviour
 
     private void Left_GenerateFace()
     {
-        if (this[position + voxelFaceChecks[2]].isSolid)
+        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[2]))
             return;
         lastVertex = vertices.Count;
 
         //Declare vertices
-        vertices.Add(position + new Vector3(-0.5f, 0, -0.5f)); //0
-        vertices.Add(position + new Vector3(-0.5f, 1, -0.5f)); //1
-        vertices.Add(position + new Vector3(-0.5f, 1, 0.5f)); //2
-        vertices.Add(position + new Vector3(-0.5f, 0, 0.5f)); //3
+        vertices.Add(blockPos + new Vector3(-0.5f, 0, -0.5f)); //0
+        vertices.Add(blockPos + new Vector3(-0.5f, 1, -0.5f)); //1
+        vertices.Add(blockPos + new Vector3(-0.5f, 1, 0.5f)); //2
+        vertices.Add(blockPos + new Vector3(-0.5f, 0, 0.5f)); //3
 
         AddTriangles();
         AddUVs(0);
@@ -202,15 +223,15 @@ public class Container : MonoBehaviour
 
     private void Right_GenerateFace()
     {
-        if (this[position + voxelFaceChecks[3]].isSolid)
+        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[3]))
             return;
         lastVertex = vertices.Count;
 
         //Declare vertices
-        vertices.Add(position + new Vector3(0.5f, 0, 0.5f)); //0
-        vertices.Add(position + new Vector3(0.5f, 1, 0.5f)); //1
-        vertices.Add(position + new Vector3(0.5f, 1, -0.5f)); //2
-        vertices.Add(position + new Vector3(0.5f, 0, -0.5f)); //3
+        vertices.Add(blockPos + new Vector3(0.5f, 0, 0.5f)); //0
+        vertices.Add(blockPos + new Vector3(0.5f, 1, 0.5f)); //1
+        vertices.Add(blockPos + new Vector3(0.5f, 1, -0.5f)); //2
+        vertices.Add(blockPos + new Vector3(0.5f, 0, -0.5f)); //3
 
         AddTriangles();
         AddUVs(0);
@@ -218,15 +239,15 @@ public class Container : MonoBehaviour
 
     private void Top_GenerateFace()
     {
-        if (this[position + voxelFaceChecks[5]].isSolid)
+        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[5]))
             return;
         lastVertex = vertices.Count;
 
         //Declare vertices
-        vertices.Add(position + new Vector3(0.5f, 1, -0.5f)); //0
-        vertices.Add(position + new Vector3(0.5f, 1, 0.5f)); //1
-        vertices.Add(position + new Vector3(-0.5f, 1, 0.5f)); //2
-        vertices.Add(position + new Vector3(-0.5f, 1, -0.5f)); //3
+        vertices.Add(blockPos + new Vector3(0.5f, 1, -0.5f)); //0
+        vertices.Add(blockPos + new Vector3(0.5f, 1, 0.5f)); //1
+        vertices.Add(blockPos + new Vector3(-0.5f, 1, 0.5f)); //2
+        vertices.Add(blockPos + new Vector3(-0.5f, 1, -0.5f)); //3
 
         AddTriangles();
         AddUVs(1);
@@ -234,15 +255,15 @@ public class Container : MonoBehaviour
 
     private void Bottom_GenerateFace()
     {
-        if (this[position + voxelFaceChecks[4]].isSolid)
+        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[4]))
             return;
         lastVertex = vertices.Count;
 
         //Declare vertices
-        vertices.Add(position + new Vector3(-0.5f, 0, -0.5f)); //0
-        vertices.Add(position + new Vector3(-0.5f, 0, 0.5f)); //1
-        vertices.Add(position + new Vector3(0.5f, 0, 0.5f)); //2
-        vertices.Add(position + new Vector3(0.5f, 0, -0.5f)); //3
+        vertices.Add(blockPos + new Vector3(-0.5f, 0, -0.5f)); //0
+        vertices.Add(blockPos + new Vector3(-0.5f, 0, 0.5f)); //1
+        vertices.Add(blockPos + new Vector3(0.5f, 0, 0.5f)); //2
+        vertices.Add(blockPos + new Vector3(0.5f, 0, -0.5f)); //3
 
         AddTriangles();
         AddUVs(2);
@@ -263,10 +284,10 @@ public class Container : MonoBehaviour
 
     private void AddUVs(int uvFace)
     {
-        uvs.Add((blockData.atlasCoordinate[uvFace] * textureWidth) / (textureWidth * numTextures));
-        uvs.Add(((blockData.atlasCoordinate[uvFace] + Vector2.up) * textureWidth) / (textureWidth * numTextures));
-        uvs.Add(((blockData.atlasCoordinate[uvFace] + Vector2.one) * textureWidth) / (textureWidth * numTextures));
-        uvs.Add(((blockData.atlasCoordinate[uvFace] + Vector2.right) * textureWidth) / (textureWidth * numTextures));
+        uvs.Add((blockData[0].atlasCoordinate[uvFace] * textureWidth) / (textureWidth * numTextures));
+        uvs.Add(((blockData[0].atlasCoordinate[uvFace] + Vector2.up) * textureWidth) / (textureWidth * numTextures));
+        uvs.Add(((blockData[0].atlasCoordinate[uvFace] + Vector2.one) * textureWidth) / (textureWidth * numTextures));
+        uvs.Add(((blockData[0].atlasCoordinate[uvFace] + Vector2.right) * textureWidth) / (textureWidth * numTextures));
     }
 
     #endregion

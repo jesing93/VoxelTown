@@ -319,7 +319,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2024032979}
   - component: {fileID: 2024032978}
-  - component: {fileID: 2024032980}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: Untagged
@@ -341,7 +340,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textureAtlas: {fileID: 2800000, guid: a04af3bef923f4aaf882b3f886f7d74f, type: 3}
   blockTypes:
+  - {fileID: 11400000, guid: 4bb1454842d77ba4e84f354be8652d47, type: 2}
   - {fileID: 11400000, guid: c250d0d125707a742ac07d35e1505008, type: 2}
+  - {fileID: 11400000, guid: d1dcce1ce77ae624c82ab6939d58ce56, type: 2}
   worldSettings:
     containerSize: 8
     maxHeight: 8
@@ -355,25 +356,12 @@ Transform:
   m_GameObject: {fileID: 2024032977}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.140682, y: -6.0665026, z: 11.812276}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2024032980
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2024032977}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab4a1b80fa4def7448445e7ab15cd8ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  noiseShader: {fileID: 7200000, guid: 0a7704c48e8acb04bae9939a00c93d51, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

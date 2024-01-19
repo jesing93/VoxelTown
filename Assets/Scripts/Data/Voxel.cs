@@ -4,13 +4,13 @@ using UnityEngine;
 
 public struct Voxel
 {
-    public int ID;
+    public BlockType blockType;
 
     public bool isSolid
     {
         get
         {
-            return ID != 0;
+            return blockType != BlockType.air;
         }
     }
 }

@@ -12,6 +12,7 @@ public class Block : ScriptableObject
 
 public enum BlockType 
 {
+    air,
     dirt,
     stone,
     bedrock

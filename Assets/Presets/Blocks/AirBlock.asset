@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab309774fb09f1040bfd248501bfa92d, type: 3}
-  m_Name: DirtBlock
+  m_Name: AirBlock
   m_EditorClassIdentifier: 
-  blockType: 1
+  blockType: 0
   atlasCoordinate:
-  - {x: 2, y: 15}
-  - {x: 0, y: 15}
-  - {x: 13, y: 7}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}
+  - {x: 0, y: 0}

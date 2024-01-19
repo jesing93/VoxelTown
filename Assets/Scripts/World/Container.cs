@@ -11,13 +11,13 @@ using UnityEngine.UIElements;
 
 public class Container : MonoBehaviour
 {
-    private Block[] blockData;
+    private Dictionary<BlockType, Block> blockData;
     private Texture2D textureAtlas;
     private Vector3 blockPos;
     public Vector3 containerPosition;
 
     // Noise buffer data
-    public NoiseBuffer data;
+    public Dictionary<Vector3, Voxel> data;
     private Mesh meshData;
 
     //Components
@@ -48,20 +48,20 @@ public class Container : MonoBehaviour
     /// </summary>
     /// <param name="atlas"></param>
     /// <param name="newBlockData"></param>
-    public void Initialize(Vector3 position, Texture2D atlas, Block[] newBlockData)
+    public void Initialize(Vector3 position, Texture2D atlas, Dictionary<BlockType, Block> newBlockData)
     {
         ConfigureComponents();
         textureAtlas = atlas;
         blockData = newBlockData;
-        data = ComputeManager.Instance.GetNoiseBuffer();
+        data = new Dictionary<Vector3, Voxel>();
         containerPosition = position;
 
-        /*vertices.Clear();
+        vertices.Clear();
         triangles.Clear();
         uvs.Clear();
 
         //Get atlas width
-        textureWidth = textureAtlas.width;*/
+        textureWidth = textureAtlas.width;
     }
 
     private void ConfigureComponents()
@@ -76,7 +76,7 @@ public class Container : MonoBehaviour
     /// </summary>
     public void ClearData()
     {
-        ComputeManager.Instance.CleanAndRequeueBuffer(data);
+        data.Clear();
     }
 
     /// <summary>
@@ -94,31 +94,24 @@ public class Container : MonoBehaviour
     /// </summary>
     public void GenerateMesh()
     {
-        Voxel block;
 
         //int counter = 0;
         Vector3[] faceVertices = new Vector3[4];
         Vector2[] faceUVs = new Vector2[4];
 
-        for (int x = 1; x < WorldManager.WorldSettings.containerSize + 1; x++)
+        foreach (KeyValuePair<Vector3, Voxel> kvp in data)
         {
-            for (int y = 0; y < WorldManager.WorldSettings.maxHeight; y++)
-            {
-                for (int z = 1; z < WorldManager.WorldSettings.containerSize + 1; z++)
-                {
-                    blockPos = new(x, y, z);
-                    block = this[blockPos];
-                    
-                    DrawCube();
+            if (kvp.Value.blockType == BlockType.air)
+                continue;
 
-                    //Set the mesh data
-                    meshData.vertices = vertices.ToArray();
-                    meshData.triangles = triangles.ToArray();
-                    meshData.SetUVs(0, uvs.ToArray());
-                    //Recalculate lightning
-                    meshData.RecalculateNormals();
-                }
-            }
+            DrawCube(kvp.Key, kvp.Value.blockType);
+
+            //Set the mesh data
+            meshData.vertices = vertices.ToArray();
+            meshData.triangles = triangles.ToArray();
+            meshData.SetUVs(0, uvs.ToArray());
+            //Recalculate lightning
+            meshData.RecalculateNormals();
         }
     }
 
@@ -135,47 +128,42 @@ public class Container : MonoBehaviour
         meshRenderer.material.mainTexture = textureAtlas;
     }
 
-    /// <summary>
-    /// Check if voxel in point is solid
-    /// </summary>
-    /// <param name="point"></param>
-    /// <returns></returns>
-    public bool checkVoxelIsSolid(Vector3 point)
-    {
-        if (point.y < 0 || (point.x > WorldManager.WorldSettings.containerSize + 2) || (point.z > WorldManager.WorldSettings.containerSize + 2))
-            return true;
-        else
-            return this[point].isSolid;
-    }
-
     public Voxel this[Vector3 index]
     {
         get
         {
-            return data[index];
+            if (data.ContainsKey(index))
+                return data[index];
+            else
+                return emptyVoxel;
         }
 
         set
         {
-            data[index] = value;
+            if(!data.ContainsKey(index))
+                data[index] = value;
+            else
+                data.Add(index, value);
         }
     }
 
+    public static Voxel emptyVoxel = new ();
+
     #region CubeGeneration
 
-    private void DrawCube()
+    private void DrawCube( Vector3 blockPos, BlockType blockType )
     {
-        Front_GenerateFace();
-        Back_GenerateFace();
-        Right_GenerateFace();
-        Left_GenerateFace();
-        Top_GenerateFace();
-        Bottom_GenerateFace();
+        Front_GenerateFace(blockPos, blockType);
+        Back_GenerateFace(blockPos, blockType);
+        Right_GenerateFace(blockPos, blockType);
+        Left_GenerateFace(blockPos, blockType);
+        Top_GenerateFace(blockPos, blockType);
+        Bottom_GenerateFace(blockPos, blockType);
     }
 
-    private void Front_GenerateFace()
+    private void Front_GenerateFace(Vector3 blockPos, BlockType blockType)
     {//Only check on solid blocks
-        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[1]))
+        if (this[blockPos + voxelFaceChecks[1]].isSolid)
             return;
         lastVertex = vertices.Count;
 
@@ -186,12 +174,12 @@ public class Container : MonoBehaviour
         vertices.Add(blockPos + new Vector3(0.5f, 0, 0.5f)); //3
 
         AddTriangles();
-        AddUVs(0);
+        AddUVs(blockData[blockType].atlasCoordinate[0]);
     }
 
-    private void Back_GenerateFace()
+    private void Back_GenerateFace(Vector3 blockPos, BlockType blockType)
     {
-        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[0]))
+        if (this[blockPos + voxelFaceChecks[0]].isSolid)
             return;
         lastVertex = vertices.Count;
 
@@ -202,12 +190,12 @@ public class Container : MonoBehaviour
         vertices.Add(blockPos + new Vector3(-0.5f, 0, -0.5f)); //3
 
         AddTriangles();
-        AddUVs(0);
+        AddUVs(blockData[blockType].atlasCoordinate[0]);
     }
 
-    private void Left_GenerateFace()
+    private void Left_GenerateFace(Vector3 blockPos, BlockType blockType)
     {
-        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[2]))
+        if (this[blockPos + voxelFaceChecks[2]].isSolid)
             return;
         lastVertex = vertices.Count;
 
@@ -218,12 +206,12 @@ public class Container : MonoBehaviour
         vertices.Add(blockPos + new Vector3(-0.5f, 0, 0.5f)); //3
 
         AddTriangles();
-        AddUVs(0);
+        AddUVs(blockData[blockType].atlasCoordinate[0]);
     }
 
-    private void Right_GenerateFace()
+    private void Right_GenerateFace(Vector3 blockPos, BlockType blockType)
     {
-        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[3]))
+        if (this[blockPos + voxelFaceChecks[3]].isSolid)
             return;
         lastVertex = vertices.Count;
 
@@ -234,12 +222,12 @@ public class Container : MonoBehaviour
         vertices.Add(blockPos + new Vector3(0.5f, 0, -0.5f)); //3
 
         AddTriangles();
-        AddUVs(0);
+        AddUVs(blockData[blockType].atlasCoordinate[0]);
     }
 
-    private void Top_GenerateFace()
+    private void Top_GenerateFace(Vector3 blockPos, BlockType blockType)
     {
-        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[5]))
+        if (this[blockPos + voxelFaceChecks[5]].isSolid)
             return;
         lastVertex = vertices.Count;
 
@@ -250,12 +238,12 @@ public class Container : MonoBehaviour
         vertices.Add(blockPos + new Vector3(-0.5f, 1, -0.5f)); //3
 
         AddTriangles();
-        AddUVs(1);
+        AddUVs(blockData[blockType].atlasCoordinate[1]);
     }
 
-    private void Bottom_GenerateFace()
+    private void Bottom_GenerateFace(Vector3 blockPos, BlockType blockType)
     {
-        if (checkVoxelIsSolid(blockPos + voxelFaceChecks[4]))
+        if (this[blockPos + voxelFaceChecks[4]].isSolid)
             return;
         lastVertex = vertices.Count;
 
@@ -266,7 +254,7 @@ public class Container : MonoBehaviour
         vertices.Add(blockPos + new Vector3(0.5f, 0, -0.5f)); //3
 
         AddTriangles();
-        AddUVs(2);
+        AddUVs(blockData[blockType].atlasCoordinate[2]);
     }
 
     private void AddTriangles()
@@ -282,12 +270,12 @@ public class Container : MonoBehaviour
         triangles.Add(lastVertex + 2);
     }
 
-    private void AddUVs(int uvFace)
+    private void AddUVs(Vector2 coord)
     {
-        uvs.Add((blockData[0].atlasCoordinate[uvFace] * textureWidth) / (textureWidth * numTextures));
-        uvs.Add(((blockData[0].atlasCoordinate[uvFace] + Vector2.up) * textureWidth) / (textureWidth * numTextures));
-        uvs.Add(((blockData[0].atlasCoordinate[uvFace] + Vector2.one) * textureWidth) / (textureWidth * numTextures));
-        uvs.Add(((blockData[0].atlasCoordinate[uvFace] + Vector2.right) * textureWidth) / (textureWidth * numTextures));
+        uvs.Add((coord * textureWidth) / (textureWidth * numTextures));
+        uvs.Add(((coord + Vector2.up) * textureWidth) / (textureWidth * numTextures));
+        uvs.Add(((coord + Vector2.one) * textureWidth) / (textureWidth * numTextures));
+        uvs.Add(((coord + Vector2.right) * textureWidth) / (textureWidth * numTextures));
     }
 
     #endregion

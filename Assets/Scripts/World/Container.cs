@@ -16,7 +16,7 @@ public class Container : MonoBehaviour
     private Vector3 blockPos;
     public Vector3 containerPosition;
 
-    // Noise buffer data
+    // Voxel data
     public Dictionary<Vector3, Voxel> data;
     private Mesh meshData;
 

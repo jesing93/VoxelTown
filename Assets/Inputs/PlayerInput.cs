@@ -89,6 +89,24 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Save"",
+                    ""type"": ""Button"",
+                    ""id"": ""0f413fd7-6ac2-42c2-8061-11ddbc8d8b86"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Load"",
+                    ""type"": ""Button"",
+                    ""id"": ""e6f672c6-95ca-4b8f-8d37-a1ba7ce57f27"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -267,6 +285,28 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Confirm"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2b486b63-15e6-427d-9426-fa8d9ad4d574"",
+                    ""path"": ""<Keyboard>/o"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Save"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2d05f472-6a7d-4419-adfc-6f3cdd376ca1"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Load"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -282,6 +322,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Camera_Cancel = m_Camera.FindAction("Cancel", throwIfNotFound: true);
         m_Camera_RotateBP = m_Camera.FindAction("RotateBP", throwIfNotFound: true);
         m_Camera_Confirm = m_Camera.FindAction("Confirm", throwIfNotFound: true);
+        m_Camera_Save = m_Camera.FindAction("Save", throwIfNotFound: true);
+        m_Camera_Load = m_Camera.FindAction("Load", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -350,6 +392,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Camera_Cancel;
     private readonly InputAction m_Camera_RotateBP;
     private readonly InputAction m_Camera_Confirm;
+    private readonly InputAction m_Camera_Save;
+    private readonly InputAction m_Camera_Load;
     public struct CameraActions
     {
         private @PlayerInput m_Wrapper;
@@ -361,6 +405,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @Cancel => m_Wrapper.m_Camera_Cancel;
         public InputAction @RotateBP => m_Wrapper.m_Camera_RotateBP;
         public InputAction @Confirm => m_Wrapper.m_Camera_Confirm;
+        public InputAction @Save => m_Wrapper.m_Camera_Save;
+        public InputAction @Load => m_Wrapper.m_Camera_Load;
         public InputActionMap Get() { return m_Wrapper.m_Camera; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -391,6 +437,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Confirm.started += instance.OnConfirm;
             @Confirm.performed += instance.OnConfirm;
             @Confirm.canceled += instance.OnConfirm;
+            @Save.started += instance.OnSave;
+            @Save.performed += instance.OnSave;
+            @Save.canceled += instance.OnSave;
+            @Load.started += instance.OnLoad;
+            @Load.performed += instance.OnLoad;
+            @Load.canceled += instance.OnLoad;
         }
 
         private void UnregisterCallbacks(ICameraActions instance)
@@ -416,6 +468,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Confirm.started -= instance.OnConfirm;
             @Confirm.performed -= instance.OnConfirm;
             @Confirm.canceled -= instance.OnConfirm;
+            @Save.started -= instance.OnSave;
+            @Save.performed -= instance.OnSave;
+            @Save.canceled -= instance.OnSave;
+            @Load.started -= instance.OnLoad;
+            @Load.performed -= instance.OnLoad;
+            @Load.canceled -= instance.OnLoad;
         }
 
         public void RemoveCallbacks(ICameraActions instance)
@@ -442,5 +500,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnCancel(InputAction.CallbackContext context);
         void OnRotateBP(InputAction.CallbackContext context);
         void OnConfirm(InputAction.CallbackContext context);
+        void OnSave(InputAction.CallbackContext context);
+        void OnLoad(InputAction.CallbackContext context);
     }
 }

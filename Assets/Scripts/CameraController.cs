@@ -26,10 +26,12 @@ public class CameraController : MonoBehaviour
 
     //Components
     private Camera cam;
-    private PlayerInput inputAction;
+
+    public static CameraController Instance;
 
     private void Awake()
     {
+        Instance = this;
         cam = GetComponentInChildren<Camera>();
         curZoom = cam.transform.localPosition.y;
         curXRot = -50;

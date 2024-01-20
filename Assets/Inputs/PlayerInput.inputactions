@@ -67,6 +67,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Save",
+                    "type": "Button",
+                    "id": "0f413fd7-6ac2-42c2-8061-11ddbc8d8b86",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Load",
+                    "type": "Button",
+                    "id": "e6f672c6-95ca-4b8f-8d37-a1ba7ce57f27",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -243,6 +261,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2b486b63-15e6-427d-9426-fa8d9ad4d574",
+                    "path": "<Keyboard>/o",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Save",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2d05f472-6a7d-4419-adfc-6f3cdd376ca1",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Load",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

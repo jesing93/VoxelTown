@@ -13,19 +13,27 @@ public class WorldManager : MonoBehaviour
     //All generated chunks
     private Dictionary<Vector3, Container> chunks = new();
 
+    public Dictionary<Vector3, Container> Chunks { get => chunks; }
+
     private void Start()
     {
         foreach (Block block in blockTypes) { 
             blockDictionary.Add(block.blockType, block);
         }
         WorldSettings = worldSettings;
-        GenerateChunk(Vector3.zero);
-        GenerateChunk(Vector3.right);
-        GenerateChunk(Vector3.forward);
-        GenerateChunk(Vector3.forward + Vector3.right);
+
+        CreateChunk(Vector3.zero);
+        CreateChunk(Vector3.right);
+        CreateChunk(Vector3.forward);
+        CreateChunk(Vector3.forward + Vector3.right);
     }
 
-    private void GenerateChunk(Vector3 index)
+    /// <summary>
+    /// Create a new chunk and generate it if requested
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="generate"></param>
+    private void CreateChunk(Vector3 index, bool generate = true)
     {
         GameObject cubeObj = new GameObject("CubeContainer");
         cubeObj.transform.parent = transform;
@@ -33,61 +41,77 @@ public class WorldManager : MonoBehaviour
         Container container = cubeObj.AddComponent<Container>();
         container.Initialize(Vector3.zero, textureAtlas, blockDictionary);
 
-        //Island generation
+        chunks.Add(index, container);
 
-        //Island length
-        int randomX = Random.Range(10, 21);
-        int lastMinZ = Random.Range(-1, 1);
-        int lastMaxZ = Random.Range(0, 2);
-        int offsetX = Random.Range(-20, 20);
-        int offsetZ = Random.Range(-20, 20);
-
-        //For each column while x < length or z not closed AND x is less than 25 to avoid overlapping of islands
-        for (int x = 0; (x < randomX || lastMaxZ > lastMinZ) && x < 25; x++)
+        if (generate)
         {
-            //If not first loop
-            if (x != 0)
-            {
-                //If first half: better growing probability
-                if (x < randomX / 2)
-                {
-                    lastMinZ = lastMinZ + Random.Range(-3, 2);
-                    lastMaxZ = lastMaxZ + Random.Range(-1, 4);
-                }
-                //If second half: better shrinking probability
-                else
-                {
-                    lastMinZ = lastMinZ + Random.Range(-1, 4);
-                    lastMaxZ = lastMaxZ + Random.Range(-3, 2);
-                }
-            }
+            //Island generation
 
-            //For each space between min and max z
-            for (int z = lastMinZ; z < lastMaxZ; z++)
+            //Island length
+            int randomX = Random.Range(10, 21);
+            int lastMinZ = Random.Range(-1, 1);
+            int lastMaxZ = Random.Range(0, 2);
+            int offsetX = Random.Range(-20, 20);
+            int offsetZ = Random.Range(-20, 20);
+
+            //For each column while x < length or z not closed AND x is less than 25 to avoid overlapping of islands
+            for (int x = 0; (x < randomX || lastMaxZ > lastMinZ) && x < 25; x++)
             {
-                //Random depth of each space
-                int randomYHeight = Random.Range(-3, -8);
-                for (int y = 0; y > randomYHeight; y--)
+                //If not first loop
+                if (x != 0)
                 {
-                    //Make first 2 blocks out of dirt
-                    BlockType newBlocktype;
-                    if (y >= -1)
+                    //If first half: better growing probability
+                    if (x < randomX / 2)
                     {
-                        newBlocktype = BlockType.dirt;
+                        lastMinZ = lastMinZ + Random.Range(-3, 2);
+                        lastMaxZ = lastMaxZ + Random.Range(-1, 4);
                     }
+                    //If second half: better shrinking probability
                     else
                     {
-                        newBlocktype = BlockType.stone;
+                        lastMinZ = lastMinZ + Random.Range(-1, 4);
+                        lastMaxZ = lastMaxZ + Random.Range(-3, 2);
                     }
-                    //Create voxel
-                    container[new Vector3(x + offsetX, y, z + offsetZ)] = new Voxel { blockType = newBlocktype };
+                }
+
+                //For each space between min and max z
+                for (int z = lastMinZ; z < lastMaxZ; z++)
+                {
+                    //Random depth of each space
+                    int randomYHeight = Random.Range(-3, -8);
+                    for (int y = 0; y > randomYHeight; y--)
+                    {
+                        //Make first 2 blocks out of dirt
+                        BlockType newBlocktype;
+                        if (y >= -1)
+                        {
+                            newBlocktype = BlockType.dirt;
+                        }
+                        else
+                        {
+                            newBlocktype = BlockType.stone;
+                        }
+                        //Create voxel
+                        container[new Vector3(x + offsetX, y, z + offsetZ)] = new Voxel { blockType = newBlocktype };
+                    }
                 }
             }
+            //Once generated, render chunk
+            container.RenderMesh();
         }
-        //Once generated, render chunk
-        container.RenderMesh();
+    }
 
-        chunks.Add(index, container);
+    public void LoadChunks(Dictionary<Vector3, Dictionary<Vector3, Voxel>> loadedChunks)
+    {
+        //TODO: Fix chunk Save/Load
+        chunks.Clear();
+        foreach (KeyValuePair<Vector3, Dictionary<Vector3, Voxel>> kvp in loadedChunks)
+        {
+            Debug.Log("Load chunk: " + kvp.Key);
+            CreateChunk(kvp.Key, false);
+            chunks[kvp.Key].data = kvp.Value;
+            chunks[kvp.Key].RenderMesh();
+        }
     }
 
     public static WorldSettings WorldSettings;

@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cost: 5
   costPerTurn: 1
-  prefab: {fileID: 1677813695698764010, guid: d19497fbc1cb06549bf0800aa04e27fd, type: 3}
-  buildingMesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+  prefab: {fileID: 5449567012505427580, guid: 7e0cfd5234f60794b9ae77a5dbe0b61d, type: 3}
   population: 0
   jobs: 0
   food: 0

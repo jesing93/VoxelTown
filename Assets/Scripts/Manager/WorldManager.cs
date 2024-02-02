@@ -38,6 +38,7 @@ public class WorldManager : MonoBehaviour
         GameObject cubeObj = new GameObject("CubeContainer");
         cubeObj.transform.parent = transform;
         cubeObj.transform.position = index * 100;
+        cubeObj.layer = LayerMask.NameToLayer("Ground");
         Container container = cubeObj.AddComponent<Container>();
         container.Initialize(Vector3.zero, textureAtlas, blockDictionary);
 

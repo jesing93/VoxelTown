@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    public Transform player;
+    //public Transform player;
 
     private Data data;
 

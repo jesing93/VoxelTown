@@ -46,7 +46,7 @@ public class BuildingPlacement : MonoBehaviour
             {
                 placementIndicator.transform.position = curIndicatorPos;
                 Collider[] hitColliders = Physics.OverlapBox(placementIndicator.transform.position + new Vector3(0, 0.5f, 0), new Vector3(0.49f, 0.49f, 0.49f), Quaternion.identity, buildingLayer);
-                Debug.Log(hitColliders.Length);
+                //Debug.Log(hitColliders.Length);
                 if (hitColliders.Length == 0)
                 {
                     isPlacementValid = true;

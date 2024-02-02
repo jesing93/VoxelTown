@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22f6f0d40eee00c4e9267dcd5219d154, type: 3}
-  m_Name: Factory
+  m_Name: Office
   m_EditorClassIdentifier: 
   cost: 100
   costPerTurn: 20
-  prefab: {fileID: 3561896270870756456, guid: 5c53d28ad2e91e146b741287ffae6ac6, type: 3}
+  prefab: {fileID: 4428643394606347181, guid: b5a31a726e8916c42a69342e5bf0b290, type: 3}
   population: 0
   jobs: 30
   food: 0

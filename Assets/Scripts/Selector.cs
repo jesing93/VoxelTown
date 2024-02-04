@@ -38,7 +38,7 @@ public class Selector : MonoBehaviour
             Vector3 newPos = hit.point;
             if (hit.normal == Vector3.up) //If we hit the top face
             {
-                newPos -= new Vector3(0.5f, 0f, 0.5f);
+                //newPos -= new Vector3(0.5f, 0f, 0.5f);
             }
             if (hit.normal == Vector3.down) //If we hit the bottom face
             {

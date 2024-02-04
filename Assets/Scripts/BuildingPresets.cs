@@ -6,10 +6,13 @@ using UnityEngine;
 public class BuildingPresets : ScriptableObject
 {
     public int cost;
+    public resourceType resourceCost;
     public int costPerTurn;
     public GameObject prefab;
+    public bool isMoneyMaker;
 
     public int population;
     public int jobs;
     public int food;
+    public int materials;
 }

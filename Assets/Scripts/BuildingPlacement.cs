@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.HID;
 
 public class BuildingPlacement : MonoBehaviour
 {
@@ -18,14 +19,18 @@ public class BuildingPlacement : MonoBehaviour
 
     public GameObject placementIndicator;
     public GameObject bulldozerIndicator;
+    public GameObject validIndicator;
+    public GameObject invalidIndicator;
 
     private PlayerInput playerInput;
 
     private LayerMask buildingLayer;
+    private LayerMask groundLayer;
 
     private void Awake()
     {
         buildingLayer = LayerMask.GetMask("Building");
+        groundLayer = LayerMask.GetMask("Ground");
         playerInput = new PlayerInput();
         //Assign this function to the input event
         playerInput.Camera.Cancel.performed += e => OnCancelBuildingPlacement();
@@ -47,15 +52,36 @@ public class BuildingPlacement : MonoBehaviour
                 placementIndicator.transform.position = curIndicatorPos;
                 Collider[] hitColliders = Physics.OverlapBox(placementIndicator.transform.position + new Vector3(0, 0.5f, 0), new Vector3(0.49f, 0.49f, 0.49f), Quaternion.identity, buildingLayer);
                 //Debug.Log(hitColliders.Length);
-                if (hitColliders.Length == 0)
+                if (hitColliders.Length == 0 && 
+                    ((curBuildingPreset.resourceCost == resourceType.money && City.Instance.money >= curBuildingPreset.cost) || 
+                    (curBuildingPreset.resourceCost == resourceType.material && City.Instance.materials >= curBuildingPreset.cost)))
                 {
-                    isPlacementValid = true;
+                    Ray ray = new(placementIndicator.transform.position, Vector3.down);
+                    Debug.DrawRay(placementIndicator.transform.position, Vector3.down, Color.red, 1);
+                    //CheckGround
+                    if (Physics.Raycast(ray, .5f, groundLayer))
+                    {
+                        isPlacementValid = true;
+                    }
+                    else
+                    {
+                        isPlacementValid = true;
+                    }
                 }
                 else
                 {
                     isPlacementValid = false;
                 }
-                
+                if(isPlacementValid)
+                {
+                    validIndicator.SetActive(true);
+                    invalidIndicator.SetActive(false);
+                }
+                else
+                {
+                    validIndicator.SetActive(false);
+                    invalidIndicator.SetActive(true);
+                }
             }
             else if(isBulldozering)
             {
@@ -84,8 +110,10 @@ public class BuildingPlacement : MonoBehaviour
         {
             isPlacing = true;
             curBuildingPreset = preset;
-            placementIndicator.GetComponentInChildren<MeshFilter>().mesh = preset.prefab.GetComponentInChildren<MeshFilter>().sharedMesh;
-            placementIndicator.GetComponentInChildren<Transform>().localScale = preset.prefab.transform.GetChild(0).localScale;
+            validIndicator.GetComponent<MeshFilter>().mesh = preset.prefab.GetComponentInChildren<MeshFilter>().sharedMesh;
+            invalidIndicator.GetComponent<MeshFilter>().mesh = preset.prefab.GetComponentInChildren<MeshFilter>().sharedMesh;
+            validIndicator.GetComponent<Transform>().localScale = preset.prefab.transform.GetChild(0).localScale;
+            invalidIndicator.GetComponent<Transform>().localScale = preset.prefab.transform.GetChild(0).localScale;
             placementIndicator.SetActive(true);
         }
     }

@@ -9,11 +9,13 @@ public class City : MonoBehaviour
     [Header("Resources")]
     public int money;
     public int food;
+    public int materials;
     public int curJobs;
     public int curPopulation;
     public int maxJobs;
     public int maxPopulation;
     public int incomePerJob;
+    public int materialsPerJob;
     [Header("Time")]
     public float curDayTime;
     private float dayTime = 24;
@@ -72,7 +74,14 @@ public class City : MonoBehaviour
     public void OnPlaceBuilding(Building building)
     {
         buildings.Add(building);
-        money -= building.preset.cost;
+        if(building.preset.resourceCost == resourceType.money)
+        {
+            money -= building.preset.cost;
+        }
+        else if (building.preset.resourceCost == resourceType.material)
+        {
+            materials -= building.preset.cost;
+        }
         maxPopulation += building.preset.population;
         maxJobs += building.preset.jobs;
         UpdateStatsText();
@@ -105,6 +114,7 @@ public class City : MonoBehaviour
     public void NextDay()
     {
         CalculateMoney();
+        CalculateMaterials();
         CalculateFood();
         CalculatePop();
         CalculateJobs();
@@ -148,8 +158,29 @@ public class City : MonoBehaviour
         money += curJobs * incomePerJob;
         foreach(Building building in buildings)
         {
+            if (building.preset.isMoneyMaker) {
+                money += building.preset.jobs * incomePerJob;
+            }
+            else
+            {
+                money -= building.preset.jobs * incomePerJob;
+            }
             money -= building.preset.costPerTurn;
         }
 
     }
+    private void CalculateMaterials()
+    {
+        foreach (Building building in buildings)
+        {
+            materials += building.preset.materials;
+        }
+    }
+}
+
+public enum resourceType
+{
+    money,
+    material,
+    food
 }

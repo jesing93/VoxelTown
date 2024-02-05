@@ -13,8 +13,12 @@ MonoBehaviour:
   m_Name: Road
   m_EditorClassIdentifier: 
   cost: 5
+  resourceCost: 0
   costPerTurn: 1
   prefab: {fileID: 5449567012505427580, guid: 7e0cfd5234f60794b9ae77a5dbe0b61d, type: 3}
+  isMoneyMaker: 0
   population: 0
   jobs: 0
   food: 0
+  materials: 0
+  buildingType: 1

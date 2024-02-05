@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8239659460355593753}
   - component: {fileID: 3568486062347729943}
   - component: {fileID: 9222694547357948011}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HouseBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}

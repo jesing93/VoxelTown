@@ -21,3 +21,4 @@ MonoBehaviour:
   jobs: 0
   food: 0
   materials: 0
+  buildingType: 2

@@ -24,6 +24,7 @@ public class City : MonoBehaviour
     private int day;
 
     public TextMeshProUGUI moneyStat;
+    public TextMeshProUGUI materialsStat;
     public TextMeshProUGUI foodStat;
     public TextMeshProUGUI popStat;
     public TextMeshProUGUI jobStat;
@@ -31,6 +32,8 @@ public class City : MonoBehaviour
     public TextMeshProUGUI timeStat;
 
     public List<Building> buildings = new();
+    public List<Building> roads = new();
+    public List<Building> altBlocks = new();
 
     public static City Instance;
 
@@ -41,10 +44,10 @@ public class City : MonoBehaviour
 
     private void FixedUpdate()
     {
-        dayCycle();
+        DayCycle();
     }
 
-    private void dayCycle()
+    private void DayCycle()
     {
         curDayTime += Time.deltaTime * speedFactor;
         if(curDayTime >= dayTime)
@@ -67,18 +70,36 @@ public class City : MonoBehaviour
         timeStat.text = hourString + ":" + minutesString;
     }
 
+    public void ChangeSpeed(int newSpeed)
+    {
+        speedFactor = newSpeed;
+        CrowdManager.Instance.UpdateSpeed(newSpeed);
+    }
+
     /// <summary>
     /// Called when a building is placed
     /// </summary>
     /// <param name="building"></param>
     public void OnPlaceBuilding(Building building)
     {
-        buildings.Add(building);
-        if(building.preset.resourceCost == resourceType.money)
+        switch (building.preset.buildingType)
+        {
+            case BuildingType.Building:
+                buildings.Add(building);
+                break;
+            case BuildingType.Road:
+                roads.Add(building);
+                break;
+            case BuildingType.Block:
+                altBlocks.Add(building);
+                WorldManager.Instance.RegenerateNavMesh();
+                break;
+        }
+        if(building.preset.resourceCost == ResourceType.money)
         {
             money -= building.preset.cost;
         }
-        else if (building.preset.resourceCost == resourceType.material)
+        else if (building.preset.resourceCost == ResourceType.material)
         {
             materials -= building.preset.cost;
         }
@@ -93,7 +114,19 @@ public class City : MonoBehaviour
     /// <param name="building"></param>
     public void OnRemoveBuilding(Building building)
     {
-        buildings.Remove(building);
+        switch (building.preset.buildingType)
+        {
+            case BuildingType.Building:
+                buildings.Remove(building);
+                break;
+            case BuildingType.Road:
+                roads.Remove(building);
+                break;
+            case BuildingType.Block:
+                altBlocks.Remove(building);
+                WorldManager.Instance.RegenerateNavMesh();
+                break;
+        }
 
         maxPopulation-= building.preset.population;
         maxJobs-= building.preset.jobs;
@@ -105,6 +138,7 @@ public class City : MonoBehaviour
     private void UpdateStatsText()
     {
         moneyStat.text = string.Format("Money: {0}€", money);
+        materialsStat.text = string.Format("Materials: {0}", materials);
         foodStat.text = string.Format("Food: {0}", food);
         popStat.text = string.Format("Population: {0}/{1}", new object[2] {curPopulation, maxPopulation});
         jobStat.text = string.Format("Jobs: {0}/{1}", new object[2] { curJobs, maxJobs });
@@ -120,6 +154,8 @@ public class City : MonoBehaviour
         CalculateJobs();
 
         UpdateStatsText();
+
+        CrowdManager.Instance.maxCrowd = buildings.Count * 5;
     }
 
     private void CalculateFood()
@@ -167,7 +203,10 @@ public class City : MonoBehaviour
             }
             money -= building.preset.costPerTurn;
         }
-
+        foreach(Building building in roads)
+        {
+            money -= building.preset.costPerTurn;
+        }
     }
     private void CalculateMaterials()
     {
@@ -178,7 +217,7 @@ public class City : MonoBehaviour
     }
 }
 
-public enum resourceType
+public enum ResourceType
 {
     money,
     material,

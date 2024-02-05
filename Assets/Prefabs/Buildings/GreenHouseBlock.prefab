@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4425469987135613960}
   - component: {fileID: 4813506987885542309}
   - component: {fileID: 6246316044897863464}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GreenHouseBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}

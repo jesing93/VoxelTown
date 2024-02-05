@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Presets;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.HID;
@@ -49,44 +48,59 @@ public class BuildingPlacement : MonoBehaviour
             curIndicatorPos = Selector.Instance.GetCurTilePosition();
             if(isPlacing)
             {
-                placementIndicator.transform.position = curIndicatorPos;
-                Collider[] hitColliders = Physics.OverlapBox(placementIndicator.transform.position + new Vector3(0, 0.5f, 0), new Vector3(0.49f, 0.49f, 0.49f), Quaternion.identity, buildingLayer);
-                //Debug.Log(hitColliders.Length);
-                if (hitColliders.Length == 0 && 
-                    ((curBuildingPreset.resourceCost == resourceType.money && City.Instance.money >= curBuildingPreset.cost) || 
-                    (curBuildingPreset.resourceCost == resourceType.material && City.Instance.materials >= curBuildingPreset.cost)))
-                {
-                    Ray ray = new(placementIndicator.transform.position, Vector3.down);
-                    Debug.DrawRay(placementIndicator.transform.position, Vector3.down, Color.red, 1);
-                    //CheckGround
-                    if (Physics.Raycast(ray, .5f, groundLayer))
-                    {
-                        isPlacementValid = true;
-                    }
-                    else
-                    {
-                        isPlacementValid = true;
-                    }
-                }
-                else
-                {
-                    isPlacementValid = false;
-                }
-                if(isPlacementValid)
-                {
-                    validIndicator.SetActive(true);
-                    invalidIndicator.SetActive(false);
-                }
-                else
-                {
-                    validIndicator.SetActive(false);
-                    invalidIndicator.SetActive(true);
-                }
+                CheckValidPlacement();
             }
             else if(isBulldozering)
             {
                 bulldozerIndicator.transform.position = curIndicatorPos;
             }
+        }
+    }
+
+    /// <summary>
+    /// Check if building placement is valid
+    /// </summary>
+    private void CheckValidPlacement()
+    {
+        placementIndicator.transform.position = curIndicatorPos;
+        Collider[] hitColliders = Physics.OverlapBox(placementIndicator.transform.position + new Vector3(0, 0.5f, 0), new Vector3(0.49f, 0.49f, 0.49f), Quaternion.identity, buildingLayer);
+        //Debug.Log(hitColliders.Length);
+        if (hitColliders.Length == 0 &&
+            ((curBuildingPreset.resourceCost == ResourceType.money && City.Instance.money >= curBuildingPreset.cost) ||
+            (curBuildingPreset.resourceCost == ResourceType.material && City.Instance.materials >= curBuildingPreset.cost)))
+        {
+            if(curBuildingPreset.buildingType == BuildingType.Block)
+            {
+                isPlacementValid = true;
+            }
+            else
+            {
+                Ray ray = new(placementIndicator.transform.position + new Vector3 (0, 0.5f, 0), Vector3.down);
+                Debug.DrawRay(placementIndicator.transform.position + new Vector3(0, 0.5f, 0), Vector3.down, Color.red, 1);
+                //CheckGround
+                if (Physics.Raycast(ray, 1, groundLayer))
+                {
+                    isPlacementValid = true;
+                }
+                else
+                {
+                    isPlacementValid = false;
+                }
+            }
+        }
+        else
+        {
+            isPlacementValid = false;
+        }
+        if (isPlacementValid)
+        {
+            validIndicator.SetActive(true);
+            invalidIndicator.SetActive(false);
+        }
+        else
+        {
+            validIndicator.SetActive(false);
+            invalidIndicator.SetActive(true);
         }
     }
 

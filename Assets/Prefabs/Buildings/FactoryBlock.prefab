@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3652211825353414176}
   - component: {fileID: 5524151002228401808}
   - component: {fileID: 3822622889874978068}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FactoryBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}

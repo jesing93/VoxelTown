@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 875420663530730380}
   - component: {fileID: 2175759731287484610}
   - component: {fileID: 1699007663272497754}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: OfficeBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}

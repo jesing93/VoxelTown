@@ -6,7 +6,7 @@ using UnityEngine;
 public class BuildingPresets : ScriptableObject
 {
     public int cost;
-    public resourceType resourceCost;
+    public ResourceType resourceCost;
     public int costPerTurn;
     public GameObject prefab;
     public bool isMoneyMaker;
@@ -15,4 +15,13 @@ public class BuildingPresets : ScriptableObject
     public int jobs;
     public int food;
     public int materials;
+
+    public BuildingType buildingType;
+}
+
+public enum BuildingType
+{
+    Building,
+    Road,
+    Block
 }

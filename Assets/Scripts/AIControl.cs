@@ -5,30 +5,48 @@ using UnityEngine.AI;
 
 public class AIControl : MonoBehaviour {
 
-    private GameObject[] goalLocations;
+    private Vector3 targetLocation;
     private NavMeshAgent agent;
+    private float ms = 0.2f;
     Animator anim;
-
-    void Start() {
-
-        agent = GetComponent<NavMeshAgent>();
-        goalLocations = GameObject.FindGameObjectsWithTag("goal");
-        int i = Random.Range(0, goalLocations.Length);
-        agent.SetDestination(goalLocations[i].transform.position);
-        anim = GetComponent<Animator>();
-        anim.SetTrigger("isWalking");
-        anim.SetFloat("wOffset", Random.Range(0.0f, 1.0f));
-        float ms = Random.Range(0.5f, 2f);
-        anim.SetFloat("multSpeed", ms);
-        agent.speed *= ms; 
-    }
 
 
     void Update() {
-        if (agent.remainingDistance < 1)
+        if (agent.remainingDistance < 0.5)
         {
-            int i = Random.Range(0, goalLocations.Length);
-            agent.SetDestination(goalLocations[i].transform.position);
+            CrowdManager.Instance.TargetReached(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Go to specified point
+    /// </summary>
+    /// <param name="target"></param>
+    public void GoTo(Vector3 target, int speedFactor) {
+        targetLocation = target;
+        agent = GetComponent<NavMeshAgent>();
+        agent.SetDestination(targetLocation);
+        //anim = GetComponent<Animator>();
+        //anim.SetTrigger("isWalking");
+        //anim.SetFloat("wOffset", Random.Range(0.0f, 1.0f));
+        ms = Random.Range(0.2f, 0.8f);
+        //anim.SetFloat("multSpeed", ms);
+        agent.speed = ms * speedFactor;
+    }
+
+    /// <summary>
+    /// Update the agent speed
+    /// </summary>
+    /// <param name="newSpeed"></param>
+    public void UpdateSpeed(int newSpeed)
+    {
+        if (newSpeed == 0)
+        {
+            agent.speed = 0;
+        }
+        else
+        {
+            agent.speed = ms * newSpeed;
         }
     }
 }

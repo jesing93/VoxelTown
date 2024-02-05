@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Factory
   m_EditorClassIdentifier: 
   cost: 100
+  resourceCost: 0
   costPerTurn: 20
   prefab: {fileID: 3561896270870756456, guid: 5c53d28ad2e91e146b741287ffae6ac6, type: 3}
+  isMoneyMaker: 0
   population: 0
   jobs: 30
   food: 0
+  materials: 50

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -10,10 +11,17 @@ public class WorldManager : MonoBehaviour
     private Dictionary<BlockType, Block> blockDictionary = new();
     public WorldSettings worldSettings;
 
+    private NavMeshSurface navSurface;
+
     //All generated chunks
     private Dictionary<Vector3, Container> chunks = new();
 
     public Dictionary<Vector3, Container> Chunks { get => chunks; }
+
+    private void Awake()
+    {
+        navSurface = GetComponentInChildren<NavMeshSurface>();
+    }
 
     private void Start()
     {
@@ -23,9 +31,22 @@ public class WorldManager : MonoBehaviour
         WorldSettings = worldSettings;
 
         CreateChunk(Vector3.zero);
-        CreateChunk(Vector3.right);
         CreateChunk(Vector3.forward);
+        CreateChunk(Vector3.back);
+        CreateChunk(Vector3.right);
         CreateChunk(Vector3.forward + Vector3.right);
+        CreateChunk(Vector3.back + Vector3.right);
+        CreateChunk(Vector3.left);
+        CreateChunk(Vector3.forward + Vector3.left);
+        CreateChunk(Vector3.back + Vector3.left);
+
+        RegenerateNavMesh();
+    }
+
+    public void RegenerateNavMesh()
+    {
+        navSurface.RemoveData();
+        navSurface.BuildNavMesh();
     }
 
     /// <summary>

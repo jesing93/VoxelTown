@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour
 
         //Enable player input
         playerInput.Enable();
-        Debug.Log("GameManager awake");
     }
 
     private void OnQuickSave()
